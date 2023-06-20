@@ -578,11 +578,5 @@ var (
 			Stage:        FeatureStageExperimental,
 			Owner:        grafanaObservabilityTracesAndProfilingSquad,
 		},
-		{
-			Name:        "allowedCookieRegexPattern",
-			Description: "Enables regular expression matcher for allowed cookies",
-			Stage:       FeatureStageExperimental,
-			Owner:       grafanaObservabilityMetricsSquad,
-		},
 	}
 )

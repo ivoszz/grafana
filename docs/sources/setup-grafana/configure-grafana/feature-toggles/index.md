@@ -116,7 +116,6 @@ Experimental features might be changed or removed without prior notice.
 | `recordedQueriesMulti`             | Enables writing multiple items from a single query within Recorded Queries                                   |
 | `alertingLokiRangeToInstant`       | Rewrites eligible loki range queries to instant queries                                                      |
 | `flameGraphV2`                     | New version of flame graph with new features                                                                 |
-| `allowedCookieRegexPattern`        | Enables regular expression matcher for allowed cookies                                                       |
 
 ## Development feature toggles
 

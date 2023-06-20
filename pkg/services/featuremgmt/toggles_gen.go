@@ -346,8 +346,4 @@ const (
 	// FlagFlameGraphV2
 	// New version of flame graph with new features
 	FlagFlameGraphV2 = "flameGraphV2"
-
-	// FlagAllowedCookieRegexPattern
-	// Enables regular expression matcher for allowed cookies
-	FlagAllowedCookieRegexPattern = "allowedCookieRegexPattern"
 )
