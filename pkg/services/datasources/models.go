@@ -32,10 +32,6 @@ const (
 	CustomHeaderName = "httpHeaderName"
 	// CustomHeaderValue is the prefix that is used to store the value of a custom header.
 	CustomHeaderValue = "httpHeaderValue"
-	// MO_EXACT_MATCH is for the allowed cookies. Cookie name must match exactly.
-	MO_EXACT_MATCH = "exact_match"
-	// MO_REGEX_MATCH is for the allowed cookies. Cookie name must match with the provided regex.
-	MO_REGEX_MATCH = "regex_match"
 )
 
 type DsAccess string
@@ -68,49 +64,16 @@ type DataSource struct {
 	Updated time.Time `json:"updated,omitempty"`
 }
 
-type AllowedCookies struct {
-	MatchOption  string
-	MatchPattern string
-	KeepCookies  []string
-}
-
-// AllowedCookies parses the jsondata.KeepCookies and returns a list of
+// AllowedCookies parses the jsondata.keepCookies and returns a list of
 // allowed cookies, otherwise an empty list.
-func (ds DataSource) AllowedCookies(isFlagAllowedCookieRegexPattern bool) AllowedCookies {
-	// Default matching option is exact matching
-	ac := AllowedCookies{
-		MatchOption:  MO_EXACT_MATCH,
-		MatchPattern: "",
-		KeepCookies:  []string{},
-	}
+func (ds DataSource) AllowedCookies() []string {
 	if ds.JsonData != nil {
-		aco := ds.JsonData.Get("allowedCookieOption")
-		acp := ds.JsonData.Get("allowedCookiePattern")
-		kc := ds.JsonData.Get("keepCookies")
-
-		if kc != nil {
-			ac.KeepCookies = kc.MustStringArray()
-		}
-
-		// Remove this check when FlagAllowedCookieRegexPattern is removed
-		if isFlagAllowedCookieRegexPattern {
-			if acp != nil {
-				ac.MatchPattern = acp.MustString()
-			}
-
-			if aco != nil {
-				acoStr := aco.MustString()
-				if acoStr == MO_EXACT_MATCH || acoStr == MO_REGEX_MATCH {
-					ac.MatchOption = acoStr
-				}
-			}
-		} else {
-			ac.MatchPattern = ""
-			ac.MatchOption = MO_EXACT_MATCH
+		if keepCookies := ds.JsonData.Get("keepCookies"); keepCookies != nil {
+			return keepCookies.MustStringArray()
 		}
 	}
 
-	return ac
+	return []string{}
 }
 
 // Specific error type for grpc secrets management so that we can show more detailed plugin errors to users

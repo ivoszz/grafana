@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"regexp"
 	"sort"
 
-	"github.com/grafana/grafana/pkg/services/datasources"
 	"github.com/grafana/grafana/pkg/services/user"
 )
 
@@ -44,26 +42,24 @@ func PrepareProxyRequest(req *http.Request) {
 }
 
 // ClearCookieHeader clear cookie header, except for cookies specified to be kept (keepCookiesNames) if not in skipCookiesNames.
-func ClearCookieHeader(req *http.Request, allowedCookies datasources.AllowedCookies, skipCookiesNames []string) {
+func ClearCookieHeader(req *http.Request, keepCookiesNames []string, skipCookiesNames []string) {
 	keepCookies := map[string]*http.Cookie{}
+	for _, c := range req.Cookies() {
+		for _, v := range keepCookiesNames {
+			// match all
+			if v == "*" {
+				keepCookies[c.Name] = c
+				continue
+			}
 
-	if allowedCookies.MatchOption == datasources.MO_EXACT_MATCH {
-		for _, c := range req.Cookies() {
-			for _, v := range allowedCookies.KeepCookies {
-				if c.Name == v {
+			l := len(v) - 1
+			if v[l] == '*' {
+				if len(c.Name) >= l && c.Name[:l] == v[:l] {
 					keepCookies[c.Name] = c
 				}
-			}
-		}
-	}
-
-	if allowedCookies.MatchOption == datasources.MO_REGEX_MATCH {
-		for _, c := range req.Cookies() {
-			re, err := regexp.Compile(allowedCookies.MatchPattern)
-			// Only match if the pattern is valid
-			if err == nil {
-				isMatch := re.Match([]byte(c.Name))
-				if isMatch {
+			} else {
+				// look for exact match
+				if c.Name == v {
 					keepCookies[c.Name] = c
 				}
 			}

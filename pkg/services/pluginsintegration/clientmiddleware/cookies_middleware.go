@@ -17,14 +17,11 @@ const cookieHeaderName = "Cookie"
 // NewCookiesMiddleware creates a new plugins.ClientMiddleware that will
 // forward incoming HTTP request Cookies to outgoing plugins.Client requests
 // if the datasource has enabled forwarding of cookies (keepCookies).
-// Remove features when FlagAllowedCookieRegexPattern is removed
-func NewCookiesMiddleware(skipCookiesNames []string, isFlagAllowedCookieRegexPattern bool) plugins.ClientMiddleware {
+func NewCookiesMiddleware(skipCookiesNames []string) plugins.ClientMiddleware {
 	return plugins.ClientMiddlewareFunc(func(next plugins.Client) plugins.Client {
 		return &CookiesMiddleware{
 			next:             next,
 			skipCookiesNames: skipCookiesNames,
-			// Remove features when FlagAllowedCookieRegexPattern is removed
-			isFlagAllowedCookieRegexPattern: isFlagAllowedCookieRegexPattern,
 		}
 	})
 }
@@ -32,8 +29,6 @@ func NewCookiesMiddleware(skipCookiesNames []string, isFlagAllowedCookieRegexPat
 type CookiesMiddleware struct {
 	next             plugins.Client
 	skipCookiesNames []string
-	// Remove features when FlagAllowedCookieRegexPattern is removed
-	isFlagAllowedCookieRegexPattern bool
 }
 
 func (m *CookiesMiddleware) applyCookies(ctx context.Context, pCtx backend.PluginContext, req interface{}) error {
@@ -56,7 +51,7 @@ func (m *CookiesMiddleware) applyCookies(ctx context.Context, pCtx backend.Plugi
 		Updated:  settings.Updated,
 	}
 
-	proxyutil.ClearCookieHeader(reqCtx.Req, ds.AllowedCookies(m.isFlagAllowedCookieRegexPattern), m.skipCookiesNames)
+	proxyutil.ClearCookieHeader(reqCtx.Req, ds.AllowedCookies(), m.skipCookiesNames)
 
 	cookieStr := reqCtx.Req.Header.Get(cookieHeaderName)
 	switch t := req.(type) {

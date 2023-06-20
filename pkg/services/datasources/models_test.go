@@ -14,114 +14,28 @@ func TestAllowedCookies(t *testing.T) {
 	testCases := []struct {
 		desc  string
 		given map[string]interface{}
-		want  AllowedCookies
-		// remove this then FlagAllowedCookieRegexPattern is removed
-		isFlagAllowedCookieRegexPatternEnabled bool
+		want  []string
 	}{
 		{
-			desc: "Usual json data without any pattern matching option provided",
+			desc: "Usual json data with keepCookies",
 			given: map[string]interface{}{
 				"keepCookies": []string{"cookie2"},
 			},
-			want: AllowedCookies{
-				MatchOption:  MO_EXACT_MATCH,
-				MatchPattern: "",
-				KeepCookies:  []string{"cookie2"},
-			},
+			want: []string{"cookie2"},
 		},
 		{
-			desc: "Usual json data with pattern matching option provided",
+			desc: "Usual json data without kepCookies",
 			given: map[string]interface{}{
-				"keepCookies":          []string{"cookie2"},
-				"allowedCookieOption":  "exact_matching",
-				"allowedCookiePattern": "",
+				"something": "somethingelse",
 			},
-			want: AllowedCookies{
-				MatchOption:  MO_EXACT_MATCH,
-				MatchPattern: "",
-				KeepCookies:  []string{"cookie2"},
-			},
+			want: []string(nil),
 		},
 		{
-			desc: "Usual json data with unknown pattern matching option provided",
+			desc: "Usual json data that has multiple values in keepCookies ",
 			given: map[string]interface{}{
-				"keepCookies":          []string{"cookie2"},
-				"allowedCookieOption":  "unknown_option",
-				"allowedCookiePattern": "",
+				"keepCookies": []string{"cookie1", "cookie2", "special*"},
 			},
-			want: AllowedCookies{
-				MatchOption:  MO_EXACT_MATCH,
-				MatchPattern: "",
-				KeepCookies:  []string{"cookie2"},
-			},
-		},
-		{
-			desc: "Usual json data with empty pattern matching option provided",
-			given: map[string]interface{}{
-				"keepCookies":          []string{"cookie2"},
-				"allowedCookieOption":  "",
-				"allowedCookiePattern": "",
-			},
-			want: AllowedCookies{
-				MatchOption:  MO_EXACT_MATCH,
-				MatchPattern: "",
-				KeepCookies:  []string{"cookie2"},
-			},
-		},
-		{
-			desc: "Usual json data with regex pattern matching option provided",
-			given: map[string]interface{}{
-				"keepCookies":          []string{"cookie2"},
-				"allowedCookieOption":  "regex_match",
-				"allowedCookiePattern": ".*",
-			},
-			want: AllowedCookies{
-				MatchOption:  MO_REGEX_MATCH,
-				MatchPattern: ".*",
-				KeepCookies:  []string{"cookie2"},
-			},
-			isFlagAllowedCookieRegexPatternEnabled: true,
-		},
-		{
-			desc: "Json data with regex pattern matching option provided",
-			given: map[string]interface{}{
-				"keepCookies":          []string{"cookie2"},
-				"allowedCookieOption":  "regex_match",
-				"allowedCookiePattern": `\w+`,
-			},
-			want: AllowedCookies{
-				MatchOption:  MO_REGEX_MATCH,
-				MatchPattern: `\w+`,
-				KeepCookies:  []string{"cookie2"},
-			},
-			isFlagAllowedCookieRegexPatternEnabled: true,
-		},
-		{
-			desc: "Json data with regex pattern matching option provided and empty keepCookies",
-			given: map[string]interface{}{
-				"keepCookies":          []string{},
-				"allowedCookieOption":  "regex_match",
-				"allowedCookiePattern": `^special_.*`,
-			},
-			want: AllowedCookies{
-				MatchOption:  MO_REGEX_MATCH,
-				MatchPattern: `^special_.*`,
-				KeepCookies:  []string{},
-			},
-			isFlagAllowedCookieRegexPatternEnabled: true,
-		},
-		{
-			desc: "Json data with regex pattern matching option provided and no keepCookies",
-			given: map[string]interface{}{
-				"allowedCookieOption":  "regex_match",
-				"allowedCookiePattern": `^special_.*`,
-			},
-			want: AllowedCookies{
-				MatchOption:  MO_REGEX_MATCH,
-				MatchPattern: `^special_.*`,
-				KeepCookies:  nil,
-			},
-			isFlagAllowedCookieRegexPatternEnabled: true,
+			want: []string{"cookie1", "cookie2", "special*"},
 		},
 	}
 
@@ -138,10 +52,9 @@ func TestAllowedCookies(t *testing.T) {
 				UID:      "test",
 			}
 
-			actual := ds.AllowedCookies(test.isFlagAllowedCookieRegexPatternEnabled)
-			assert.Equal(t, test.want.MatchOption, actual.MatchOption)
-			assert.Equal(t, test.want.MatchPattern, actual.MatchPattern)
-			assert.EqualValues(t, test.want.KeepCookies, actual.KeepCookies)
+			actual := ds.AllowedCookies()
+			assert.Equal(t, test.want, actual)
+			assert.EqualValues(t, test.want, actual)
 		})
 	}
 }

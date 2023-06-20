@@ -31,7 +31,7 @@ func TestCookiesMiddleware(t *testing.T) {
 
 		cdt := clienttest.NewClientDecoratorTest(t,
 			clienttest.WithReqContext(req, &user.SignedInUser{}),
-			clienttest.WithMiddlewares(NewCookiesMiddleware([]string{"grafana_session"}, false)),
+			clienttest.WithMiddlewares(NewCookiesMiddleware([]string{"grafana_session"})),
 		)
 
 		jsonDataMap := map[string]interface{}{}
@@ -100,7 +100,7 @@ func TestCookiesMiddleware(t *testing.T) {
 
 		cdt := clienttest.NewClientDecoratorTest(t,
 			clienttest.WithReqContext(req, &user.SignedInUser{}),
-			clienttest.WithMiddlewares(NewCookiesMiddleware([]string{"grafana_session"}, false)),
+			clienttest.WithMiddlewares(NewCookiesMiddleware([]string{"grafana_session"})),
 		)
 
 		jsonDataMap := map[string]interface{}{
