@@ -1,5 +1,5 @@
 import { css, cx } from '@emotion/css';
-import React, { useCallback, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { SelectableValue } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
@@ -29,19 +29,6 @@ const ACCESS_OPTIONS: Array<SelectableValue<string>> = [
   {
     label: 'Browser',
     value: 'direct',
-  },
-];
-
-const ALLOWED_COOKIE_PATTERN_OPTIONS: Array<SelectableValue<string>> = [
-  {
-    label: 'Exact match',
-    value: 'exact_match',
-    description: 'Cookies with the given name will be allowed',
-  },
-  {
-    label: 'Regex match',
-    value: 'regex_match',
-    description: 'Cookies that match with the given regex pattern will be allowed',
   },
 ];
 
@@ -86,7 +73,6 @@ export const DataSourceHttpSettings = (props: HttpSettingsProps) => {
     azureAuthSettings,
     renderSigV4Editor,
     secureSocksDSProxyEnabled,
-    allowedCookiePatternEnabled,
     urlLabel,
     urlDocs,
   } = props;
@@ -206,48 +192,14 @@ export const DataSourceHttpSettings = (props: HttpSettingsProps) => {
                 >
                   Allowed cookies
                 </InlineFormLabel>
-                {allowedCookiePatternEnabled &&
-                dataSourceConfig.jsonData.allowedCookieOption === ALLOWED_COOKIE_PATTERN_OPTIONS[1].value ? (
-                  <div className="width-20">
-                    <Input
-                      spellCheck={false}
-                      placeholder="Regex pattern"
-                      value={dataSourceConfig.jsonData.allowedCookiePattern ?? ''}
-                      onChange={(e) =>
-                        onSettingsChange({
-                          jsonData: { ...dataSourceConfig.jsonData, allowedCookiePattern: e.currentTarget.value },
-                        })
-                      }
-                    />
-                  </div>
-                ) : (
-                  <TagsInput
-                    tags={dataSourceConfig.jsonData.keepCookies}
-                    width={40}
-                    onChange={(cookies) =>
-                      onSettingsChange({ jsonData: { ...dataSourceConfig.jsonData, keepCookies: cookies } })
-                    }
-                    disabled={dataSourceConfig.readOnly}
-                  />
-                )}
-                {allowedCookiePatternEnabled && (
-                  <Select
-                    aria-label="Cookie pattern"
-                    className="width-10 gf-form-input"
-                    options={ALLOWED_COOKIE_PATTERN_OPTIONS}
-                    value={
-                      ALLOWED_COOKIE_PATTERN_OPTIONS.filter(
-                        (o) => o.value === dataSourceConfig.jsonData.allowedCookieOption
-                      )[0] ?? ALLOWED_COOKIE_PATTERN_OPTIONS[0]
-                    }
-                    onChange={(selectedValue) =>
-                      onSettingsChange({
-                        jsonData: { ...dataSourceConfig.jsonData, allowedCookieOption: selectedValue.value },
-                      })
-                    }
-                    disabled={dataSourceConfig.readOnly}
-                  />
-                )}
+                <TagsInput
+                  tags={dataSourceConfig.jsonData.keepCookies}
+                  width={40}
+                  onChange={(cookies) =>
+                    onSettingsChange({ jsonData: { ...dataSourceConfig.jsonData, keepCookies: cookies } })
+                  }
+                  disabled={dataSourceConfig.readOnly}
+                />
               </div>
               <div className="gf-form">
                 <FormField

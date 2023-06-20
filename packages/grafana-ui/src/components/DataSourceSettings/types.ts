@@ -45,6 +45,4 @@ export interface HttpSettingsProps extends HttpSettingsBaseProps {
   renderSigV4Editor?: React.ReactNode;
   /** Show the Secure Socks Datasource Proxy toggle option */
   secureSocksDSProxyEnabled?: boolean;
-  /** Show the Allowed Cookie Pattern selection **/
-  allowedCookiePatternEnabled?: boolean;
 }
