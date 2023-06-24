@@ -63,6 +63,10 @@ validate-api-spec: $(MERGED_SPEC_TARGET) $(SWAGGER) ## Validate API spec
 clean-api-spec:
 	rm -f $(SPEC_TARGET) $(MERGED_SPEC_TARGET) $(OAPI_SPEC_TARGET)
 
+.PHONY: lefthook-install
+lefthook-install:
+	$(LEFTHOOK) install
+
 ##@ OpenAPI 3
 OAPI_SPEC_TARGET = public/openapi3.json
 
