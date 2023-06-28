@@ -13,6 +13,7 @@ import {
   standardTransformersRegistry,
   TransformerRegistryItem,
   TransformerCategory,
+  DataTransformerID,
 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { reportInteraction } from '@grafana/runtime';
@@ -464,9 +465,6 @@ class UnThemedTransformationsEditor extends React.PureComponent<TransformationsE
                         onClick={() => this.setState({ selectedFilter: slug })}
                         label={label}
                         selected={this.state.selectedFilter === slug}
-                        customClass={css`
-                          white-space: nowrap;
-                        `}
                       />
                     );
                   })}
@@ -631,17 +629,19 @@ function TransformationsGrid({ transformations, onClick }: TransformationsGridPr
           <Card.Heading className={styles.heading}>
             <>
               <span>{transform.name}</span>
-              <span>
+              <span
+                className={css`
+                  margin-left: 5px;
+                `}
+              >
                 <PluginStateInfo className={styles.badge} state={transform.state} />
               </span>
             </>
           </Card.Heading>
           <Card.Description className={styles.description}>
             <>
-              {transform.description}
-              {transform.image && (
-                <img className={styles.image} src={getImagePath(transform.image)} alt={transform.name} />
-              )}
+              {getTransformationsRedesignDescriptions(transform.id)}
+              <img className={styles.image} src={getImagePath(transform.id)} alt={transform.name} />
             </>
           </Card.Description>
         </Card>
@@ -660,7 +660,7 @@ const getTransformationsGridStyles = (theme: GrafanaTheme2) => {
       width: 100%;
     `,
     card: css`
-      grid-template-rows: min-content;
+      grid-template-rows: min-content 0 min-content 0;
     `,
     badge: css`
       padding: 4px 3px;
@@ -672,6 +672,7 @@ const getTransformationsGridStyles = (theme: GrafanaTheme2) => {
         width: 100%;
         display: flex;
         justify-content: space-between;
+        align-items: center;
         flex-wrap: no-wrap;
       }
     `,
@@ -686,27 +687,31 @@ const getTransformationsGridStyles = (theme: GrafanaTheme2) => {
   };
 };
 
-const getImagePath = (image: { light: string; dark: string }) => {
-  if (config.theme2.isDark) {
-    return image.dark;
-  }
+const getImagePath = (id: string) => {
+  const folder = config.theme2.isDark ? 'dark' : 'light';
 
-  return image.light;
+  return `public/img/transformations/${folder}/${id}.svg`;
 };
 
 const getTransformationsRedesignDescriptions = (id: string): string => {
-  const overrides: { [key: string]: string } = {};
+  const overrides: { [key: string]: string } = {
+    [DataTransformerID.concatenate]: 'Combine all fields into a single frame.',
+    [DataTransformerID.configFromData]: 'Set unit, min, max and more.',
+    [DataTransformerID.fieldLookup]: 'Use a field value to lookup countries, states, or airports.',
+    [DataTransformerID.filterFieldsByName]: 'Removes part of the query results using a regex pattern.',
+    [DataTransformerID.filterByRefId]: 'Filter out queries in panels that have multiple queries.',
+    [DataTransformerID.filterByValue]: 'Removes rows of the query results using user-defined filters.',
+    [DataTransformerID.groupBy]: 'Group the data by a field value then process calculations.',
+    [DataTransformerID.groupingToMatrix]: 'Summarizes and reorganizes data based on three fields.',
+    [DataTransformerID.joinByField]: 'Combine rows from 2+ tables, based on a related field.',
+    [DataTransformerID.labelsToFields]: 'Groups series by time and return labels or tags as fields.',
+    [DataTransformerID.merge]: 'Merge multiple series. Values will be combined into one row.',
+    [DataTransformerID.organize]: 'Allows the user to re-order, hide, or rename fields / columns.',
+    [DataTransformerID.partitionByValues]: 'Splits a one-frame dataset into multiple series.',
+    [DataTransformerID.prepareTimeSeries]: 'Will stretch data frames from the wide format into the long format.',
+  };
 
-  if (overrides[id]) {
-    return overrides[id];
-  }
-
-  let transform = standardTransformersRegistry.getIfExists(id);
-  if (!transform || !transform.description) {
-    return '';
-  }
-
-  return transform.description.endsWith('.') ? transform.description : transform.description + '.';
+  return overrides[id] || standardTransformersRegistry.getIfExists(id)?.description || '';
 };
 
 export const TransformationsEditor = withTheme(UnThemedTransformationsEditor);
