@@ -694,4 +694,19 @@ const getImagePath = (image: { light: string; dark: string }) => {
   return image.light;
 };
 
+const getTransformationsRedesignDescriptions = (id: string): string => {
+  const overrides: { [key: string]: string } = {};
+
+  if (overrides[id]) {
+    return overrides[id];
+  }
+
+  let transform = standardTransformersRegistry.getIfExists(id);
+  if (!transform || !transform.description) {
+    return '';
+  }
+
+  return transform.description.endsWith('.') ? transform.description : transform.description + '.';
+};
+
 export const TransformationsEditor = withTheme(UnThemedTransformationsEditor);
