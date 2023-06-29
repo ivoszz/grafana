@@ -413,8 +413,6 @@ class UnThemedTransformationsEditor extends React.PureComponent<TransformationsE
                 <div
                   className={css`
                     font-size: 16px;
-                    display: flex;
-                    align-items: center;
                     margin-bottom: ${config.theme2.spacing(2)};
                   `}
                 >
@@ -640,8 +638,10 @@ function TransformationsGrid({ transformations, onClick }: TransformationsGridPr
           </Card.Heading>
           <Card.Description className={styles.description}>
             <>
-              {getTransformationsRedesignDescriptions(transform.id)}
-              <img className={styles.image} src={getImagePath(transform.id)} alt={transform.name} />
+              <span>{getTransformationsRedesignDescriptions(transform.id)}</span>
+              <span>
+                <img className={styles.image} src={getImagePath(transform.id)} alt={transform.name} />
+              </span>
             </>
           </Card.Description>
         </Card>
@@ -660,7 +660,7 @@ const getTransformationsGridStyles = (theme: GrafanaTheme2) => {
       width: 100%;
     `,
     card: css`
-      grid-template-rows: min-content 0 min-content 0;
+      grid-template-rows: min-content 0 1fr 0;
     `,
     badge: css`
       padding: 4px 3px;
@@ -678,6 +678,9 @@ const getTransformationsGridStyles = (theme: GrafanaTheme2) => {
     `,
     description: css`
       font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     `,
     image: css`
       display: block;
@@ -709,6 +712,9 @@ const getTransformationsRedesignDescriptions = (id: string): string => {
     [DataTransformerID.organize]: 'Allows the user to re-order, hide, or rename fields / columns.',
     [DataTransformerID.partitionByValues]: 'Splits a one-frame dataset into multiple series.',
     [DataTransformerID.prepareTimeSeries]: 'Will stretch data frames from the wide format into the long format.',
+    [DataTransformerID.reduce]: 'Reduce all rows or data points to a single value (ex. max, mean).',
+    [DataTransformerID.renameByRegex]: 'Reduce all rows or data points to a single value (ex. max, mean).',
+    [DataTransformerID.seriesToRows]: 'Merge multiple series. Return time, metric and values as a row.',
   };
 
   return overrides[id] || standardTransformersRegistry.getIfExists(id)?.description || '';
